@@ -1,0 +1,34 @@
+name: Update and Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update_and_build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      
+    - name: ls -a via ssh
+      uses: fifsky/ssh-action@master
+      with:
+        command: |
+          cd /tmp
+          ls -a
+        host: ${{ secrets.GCP_INSTANCE_IP }}
+        user: ${{ secrets.GCP_INSTANCE_USERNAME }}
+        key: ${{ secrets.GCP_INSTANCE_SSH_KEY }}
+      
+    - name: Pull Latest Changes
+      run: |
+        cd Transcendence_Backend
+        git pull
+
+    - name: Run Make
+      run: |
+        Transcendence_Backend
+        make re
